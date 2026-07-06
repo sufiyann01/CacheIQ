@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: CacheIQ
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cacheiqdb
+    username: sufiyan
+    password: sufiyan3235
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 1
+
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10m
+
+# Actuator & Prometheus
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,caches
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+# CacheIQ custom config
+cacheiq:
+  l1:
+    max-size: 1000
+    default-ttl-minutes: 10
+  l2:
+    default-ttl-minutes: 60
+  ttl:
+    hot-hours: 6
+    warm-hours: 1
+    cold-minutes: 15
+    hot-threshold: 50
+    warm-lower: 10
+    warm-upper: 50
+    hot-hit-ratio: 0.8
+  scheduler:
+    ttl-update-interval-ms: 180000   # 3 minutes
+
+server:
+  port: 8080

@@ -1,0 +1,136 @@
+{
+  "id": null,
+  "uid": "cacheiq-main",
+  "title": "CacheIQ - Multi-Level Cache Dashboard",
+  "tags": ["cacheiq", "cache", "redis", "caffeine"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "15s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "L1 Cache Hit Ratio",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(cacheiq_l1_hits_total[5m]) / (rate(cacheiq_l1_hits_total[5m]) + rate(cacheiq_l1_misses_total[5m]))",
+          "legendFormat": "L1 Hit Ratio"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "unit": "percentunit"
+      }
+    },
+    {
+      "id": 2,
+      "title": "L2 Redis Hit Ratio",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(cacheiq_l2_hits_total[5m]) / (rate(cacheiq_l2_hits_total[5m]) + rate(cacheiq_l2_misses_total[5m]))",
+          "legendFormat": "L2 Hit Ratio"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "unit": "percentunit"
+      }
+    },
+    {
+      "id": 3,
+      "title": "DB Fallback Rate",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(cacheiq_db_fallback_total[5m])",
+          "legendFormat": "DB Fallbacks/s"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "unit": "reqps"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Total Unique Keys",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "cacheiq_keys_total",
+          "legendFormat": "Keys"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      }
+    },
+    {
+      "id": 5,
+      "title": "TTL Reclassifications",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "increase(cacheiq_ttl_reclassified_total[5m])",
+          "legendFormat": "Reclassified"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Cache Hits & Misses Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        { "expr": "rate(cacheiq_l1_hits_total[1m])", "legendFormat": "L1 Hits" },
+        { "expr": "rate(cacheiq_l1_misses_total[1m])", "legendFormat": "L1 Misses" },
+        { "expr": "rate(cacheiq_l2_hits_total[1m])", "legendFormat": "L2 Hits" },
+        { "expr": "rate(cacheiq_l2_misses_total[1m])", "legendFormat": "L2 Misses" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "API Latency - Read (p50/p95/p99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, rate(cacheiq_operation_read_seconds_bucket[5m]))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.95, rate(cacheiq_operation_read_seconds_bucket[5m]))", "legendFormat": "p95" },
+        { "expr": "histogram_quantile(0.99, rate(cacheiq_operation_read_seconds_bucket[5m]))", "legendFormat": "p99" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "id": 8,
+      "title": "DB Fallback Rate Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        { "expr": "rate(cacheiq_db_fallback_total[1m])", "legendFormat": "DB Fallbacks/s" }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Top Accessed Keys",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        { "expr": "topk(10, cacheiq_key_access_count)", "legendFormat": "{{key}}" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+services:
+  # Spring Boot App
+  - type: web
+    name: cacheiq-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: cacheiq-postgres
+          property: connectionString
+      - key: SPRING_DATA_REDIS_HOST
+        fromService:
+          name: cacheiq-redis
+          type: redis
+          property: host
+      - key: SPRING_DATA_REDIS_PORT
+        fromService:
+          name: cacheiq-redis
+          type: redis
+          property: port
+
+  # Redis
+  - type: redis
+    name: cacheiq-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  # PostgreSQL
+  - name: cacheiq-postgres
+    databaseName: cacheiq
+    user: postgres
+    plan: free
