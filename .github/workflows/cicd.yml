@@ -7,7 +7,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Same branch pe naya push aaye to purana run cancel ho jaye
+
 concurrency:
   group: cicd-${{ github.ref }}
   cancel-in-progress: true
@@ -59,7 +59,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # Tests + package ek hi run me (JAR dobara build nahi hoga)
+     
       - name: Test and package
         run: mvn -B -ntp verify
         env:
@@ -84,8 +84,7 @@ jobs:
           path: target/*.jar
           if-no-files-found: error
 
-  # ─── STAGE 2: DOCKER IMAGE (sirf main) ─────────────────────────────────
-  # Dockerfile multi-stage hai, to alag se Java/Maven setup ki zaroorat nahi
+
   build-docker:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
@@ -127,7 +126,7 @@ jobs:
     environment: production
 
     steps:
-      # --fail-with-body: API error aaye to step fail hoga (pehle green dikhta tha)
+   
       - name: Trigger Render deploy
         run: |
           curl --fail-with-body -sS -X POST \
